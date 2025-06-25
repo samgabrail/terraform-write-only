@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Terraform Write-Only Secrets Demo - Vault Dev Server Setup
-# This script starts a HashiCorp Vault development server for testing write-only attributes
+# Terraform Write-Only Secrets Educational Demo - Vault Dev Server Setup
+# This script starts a HashiCorp Vault development server for the educational demo
+# comparing traditional (insecure) vs write-only attributes (secure) approaches
 
 set -e
 
@@ -199,7 +200,7 @@ verify_helper_scripts() {
 
 # Main execution
 main() {
-    print_header "Terraform Write-Only Secrets Demo - Vault Setup"
+    print_header "Terraform Write-Only Secrets Educational Demo - Vault Setup"
     
     # Create scripts directory if it doesn't exist
     mkdir -p scripts
@@ -211,17 +212,25 @@ main() {
     verify_helper_scripts
     display_connection_info
     
-    print_status "🎉 Vault development server is ready for the Terraform demo!"
+    print_status "🎉 Vault development server is ready for the educational demo!"
     print_status "✅ You already have the required versions installed!"
     print_status "   Terraform: $(terraform version | head -n1 | awk '{print $2}') (requires 1.11+)"
     print_status "   Vault: $(vault version | head -n1 | awk '{print $2}') (works great!)"
     echo ""
     print_status "Next steps:"
-    echo "  1. cd examples/"
-    echo "  2. source ../scripts/setup-env.sh"
-    echo "  3. terraform init"
-    echo "  4. terraform plan"
-    echo "  5. terraform apply"
+    echo ""
+    echo "🎓 For Educational Demo (Recommended):"
+    echo "  1. ./scripts/demo-insecure-secrets.sh   # See the problem first"
+    echo "  2. ./scripts/demo-secure-secrets.sh     # Experience the solution"
+    echo "  3. ./scripts/test-complete-demo-sequence.sh  # Compare both approaches"
+    echo ""
+    echo "🔍 For Manual Exploration:"
+    echo "  • Insecure demo: cd examples/insecure/ && source ../../scripts/setup-env.sh"
+    echo "  • Secure demo:   cd examples/secure/ && source ../../scripts/setup-env.sh"
+    echo "  • Then: terraform init && terraform plan && terraform apply"
+    echo ""
+    echo "🐘 Don't forget to start PostgreSQL for dynamic secrets:"
+    echo "  ./scripts/start-postgres-dev.sh"
 }
 
 # Handle script interruption (only on Ctrl+C, not normal exit)

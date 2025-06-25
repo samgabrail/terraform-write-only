@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Set up environment variables for Terraform write-only secrets demo
+# Set up environment variables for Terraform write-only secrets educational demo
+# This script configures the environment for both insecure and secure demos
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -11,7 +12,7 @@ NC='\033[0m' # No Color
 VAULT_ADDR="http://127.0.0.1:8200"
 VAULT_TOKEN="root"
 
-echo "🔧 Setting up environment for Terraform demo"
+echo "🔧 Setting up environment for Terraform educational demo"
 echo ""
 
 # Check if Vault is running
@@ -47,13 +48,20 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}[INFO]${NC} 🎉 Ready to run Terraform demo!"
+echo -e "${GREEN}[INFO]${NC} 🎉 Ready to run Terraform educational demo!"
 echo ""
 echo "Next steps:"
-echo "  cd examples/"
-echo "  terraform init"
-echo "  terraform plan"
-echo "  terraform apply"
+echo ""
+echo "🎓 For Educational Demo (Recommended):"
+echo "  ./scripts/demo-insecure-secrets.sh   # See the problem first"
+echo "  ./scripts/demo-secure-secrets.sh     # Experience the solution"
+echo ""
+echo "🔍 For Manual Exploration:"
+echo "  • Insecure demo: cd examples/insecure/ && terraform init && terraform plan"
+echo "  • Secure demo:   cd examples/secure/ && terraform init && terraform plan"
+echo ""
+echo "🐘 Don't forget PostgreSQL for dynamic secrets:"
+echo "  ./scripts/start-postgres-dev.sh"
 echo ""
 echo "To use these variables in your current shell session:"
 echo "  source scripts/setup-env.sh" 

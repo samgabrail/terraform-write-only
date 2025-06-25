@@ -1,16 +1,18 @@
 # Terraform Write-Only Secrets Video Script
-*Duration: 12-15 minutes*
+*Duration: 18-20 minutes*
 *Target Audience: DevOps Engineers, Platform Engineers, Security-conscious developers*
 
 ---
 
 ## Video Title Options:
-1. **"Terraform 1.11 GAME CHANGER: Secrets That Never Touch Your State File!"**
-2. **"Finally! Secure Secrets in Terraform Without State File Risk"**
-3. **"The End of Terraform's Biggest Security Problem (Write-Only Attributes)"**
+1. **"Terraform 1.11 GAME CHANGER: Educational Demo Shows Why Write-Only Secrets Matter!"**
+2. **"Finally! See the Security Problem First, Then the Revolutionary Solution"**
+3. **"The Complete Terraform Security Demo: Problem → Solution → Real PostgreSQL"**
 
 ## Video Description:
-Terraform 1.11 introduces write-only attributes - a revolutionary feature that finally solves the biggest security problem in Infrastructure as Code: how to manage secrets without storing them in state files. In this video, I'll show you exactly how to use write-only attributes with HashiCorp Vault (tested with Terraform v1.12.1 and Vault v1.18.4), demonstrate real dynamic database secrets with PostgreSQL, and walk through complete production-ready examples.
+Terraform 1.11 introduces write-only attributes - a revolutionary feature that finally solves the biggest security problem in Infrastructure as Code. This comprehensive educational demo shows you the security nightmare FIRST (using traditional approaches), then demonstrates the dramatic improvement with write-only attributes and ephemeral resources. 
+
+Includes real PostgreSQL dynamic secrets, complete state file analysis, and interactive educational scripts that guide you through the entire security transformation. Tested with Terraform v1.12.1 and Vault v1.18.4.
 
 🔗 **Links:**
 - HashiCorp Write-Only Attributes Docs: https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/write-only-arguments
@@ -19,13 +21,15 @@ Terraform 1.11 introduces write-only attributes - a revolutionary feature that f
 
 ⏰ **Timestamps:**
 00:00 - The Problem We've All Been Facing
-02:30 - What Are Write-Only Attributes?
-04:45 - Live Demo: Secure Vault Secrets
-07:15 - Ephemeral Resources Integration
-09:30 - Dynamic Database Secrets with PostgreSQL
-12:00 - Production Best Practices
-14:15 - Migration Strategy
-15:30 - Wrap-up & Next Steps
+02:30 - Educational Demo Structure Overview
+04:00 - DANGEROUS Demo: Traditional Approach (Shows Security Problem)
+08:30 - State File Analysis: The Security Nightmare Revealed
+11:00 - SECURE Demo: Write-Only Attributes Solution
+15:30 - Advanced Demo: Ephemeral Resources Integration
+18:00 - Real PostgreSQL Dynamic Secrets Testing
+20:30 - Complete Security Verification & State Analysis
+23:00 - Educational Benefits & Production Best Practices
+25:00 - Wrap-up & Next Steps
 
 ---
 
@@ -35,7 +39,7 @@ Terraform 1.11 introduces write-only attributes - a revolutionary feature that f
 
 **[ON SCREEN: Terraform logo, state file with visible secrets]**
 
-**HOST:** Hey everyone! If you've been using Terraform for infrastructure as code, you've probably lost sleep over this question: "How do I manage secrets securely without storing them in plain text in my state file?" Today I'm demonstrating the solution using Terraform v1.12.1 and Vault v1.18.4.
+**HOST:** Hey everyone! If you've been using Terraform for infrastructure as code, you've probably lost sleep over this question: "How do I manage secrets securely without storing them in plain text in my state file?" 
 
 **[SCREEN: Split screen showing state file with password visible]**
 
@@ -43,493 +47,436 @@ For years, we've been caught in this impossible security dilemma. Either we stor
 
 **[SCREEN: Diagram showing the security trilemma]**
 
-**HOST:** Well, that nightmare is officially over. Terraform 1.11 just dropped a game-changing feature called write-only attributes, and when combined with ephemeral resources, it completely transforms how we handle secrets in Infrastructure as Code.
+**HOST:** Well, that nightmare is officially over. Terraform 1.11 just dropped write-only attributes, and when combined with ephemeral resources, it completely transforms how we handle secrets in Infrastructure as Code.
 
 **[SCREEN: Terraform 1.11 release notes highlight]**
 
-I'm going to show you exactly how this works, demonstrate it live with HashiCorp Vault, and give you production-ready examples you can use today.
+But here's what makes this video special - I'm going to show you the security problem FIRST using an educational demo, then demonstrate the revolutionary solution. This isn't just about learning new features - it's about experiencing the dramatic security transformation that will change how you think about Infrastructure as Code forever.
 
-But first, let me show you just how big this problem really was...
+### [02:30 - 04:00] EDUCATIONAL DEMO STRUCTURE OVERVIEW
 
-### [02:30 - 04:45] EXPLAINING WRITE-ONLY ATTRIBUTES
+**[SCREEN: Repository structure diagram]**
 
-**[SCREEN: Terminal showing terraform.tfstate with secrets visible]**
+**HOST:** I've built a comprehensive educational demo with three tiers of examples:
 
-**HOST:** Here's what happened before Terraform 1.11. Even with sensitive = true, your secrets still end up in the state file. Anyone with access to your state file - and that's usually a lot of people - can see your production database passwords, API keys, everything.
+**[HIGHLIGHTING STRUCTURE]**
+```
+terraform-write-only/
+├── examples/
+│   ├── insecure/          # 📚 Shows the security problem
+│   ├── secure/            # ✅ Basic write-only attributes
+│   └── complete-demo.tf   # 🚀 Advanced integration
+├── scripts/
+│   ├── demo-insecure-secrets.sh   # 📚 Educational problem demo
+│   └── demo-secure-secrets.sh     # 📚 Educational solution demo
+```
 
-**[SCREEN: Animation showing write-only concept]**
+**HOST:** The genius of this approach is that you'll see EXACTLY why write-only attributes are revolutionary by experiencing the security problem first-hand, then witnessing the dramatic improvement.
 
-Write-only attributes change everything. Think of them as "write-only memory" for Terraform. You can pass secret values to resources, use them for infrastructure provisioning, but they are NEVER stored in plan files or state files.
+**[SCREEN: Educational flow diagram]**
 
-**[SCREEN: Code comparison - before/after]**
+We'll start with the traditional approach to show you the security nightmare, then move to the secure solution, and finally explore the advanced integration with ephemeral resources and real PostgreSQL dynamic secrets.
 
-Here's what makes them special:
-- They accept both regular and ephemeral values
-- Values are only available during configuration
-- State values are ALWAYS null for write-only attributes
-- They work perfectly with secret rotation and CI/CD pipelines
-
-**[SCREEN: Feature comparison table]**
-
-The best part? The Terraform SDKv2 automatically nullifies these values before sending any response back to Terraform. Providers don't even need to handle this - it's built into the framework.
-
-### [04:45 - 07:15] LIVE DEMO: COMPLETE VAULT SECRETS WORKFLOW
+### [04:00 - 08:30] DANGEROUS DEMO: Traditional Approach (Educational)
 
 **[SCREEN: Terminal with project directory]**
 
-**HOST:** Alright, let's see this in action with a complete demo. I've created a comprehensive example that shows storing secrets in Vault, retrieving them, AND real dynamic database secrets with PostgreSQL - all without any secrets touching the state file.
+**HOST:** Let me show you why this is such a big problem. I'm going to demonstrate the traditional approach first, and you'll be shocked at what happens to your secrets.
 
 **[TYPING IN TERMINAL]**
 ```bash
-# Let's start by setting up our PostgreSQL database
+# Let's start our services
 ./scripts/start-postgres-dev.sh
+./scripts/start-vault-dev.sh
+source scripts/setup-env.sh
 ```
 
-**[SCREEN: Docker pulling PostgreSQL image and starting container]**
-
-**HOST:** I'm using Docker to spin up a real PostgreSQL database for this demo. This lets us test actual dynamic database credentials, not just mock examples.
+**HOST:** Now I'm going to run our educational insecure demo. This shows what happens when you DON'T use write-only attributes.
 
 **[TYPING IN TERMINAL]**
 ```bash
-# Now let's start our Vault dev server
-./scripts/start-vault-dev.sh
+# Run the DANGEROUS traditional approach
+./scripts/demo-insecure-secrets.sh
 ```
 
-**HOST:** I've created a handy script that starts a Vault development server for us. This sets up everything we need for the demo.
+**[SCREEN: Demo script running with educational output]**
 
-**[SCREEN: Script output showing Vault starting]**
+**HOST:** Watch this educational script in action. It's not just running Terraform - it's analyzing the security implications every step of the way.
 
-Now let's set up our environment and look at our demo configuration:
+**[SCREEN: Insecure demo configuration]**
 
-**[TYPING]**
-```bash
-source scripts/setup-env.sh
-cd examples/
-```
+Let me show you what we're dealing with. This is the traditional approach using regular `data_json` instead of `data_json_wo`:
 
-**[SCREEN: VS Code showing complete-demo.tf]**
-
-**HOST:** Here's our comprehensive demo. It has three main parts - storing secrets, retrieving secrets, and using secrets in other resources. Let me show you the storing part first:
-
-**[HIGHLIGHTING CODE]**
 ```hcl
-# Store database credentials using write-only attributes
-# 🔒 These secrets will NEVER appear in terraform.tfstate
+# ⚠️  DANGEROUS: Traditional approach
+resource "vault_kv_secret_v2" "insecure_database_config" {
+  # 💀 SECURITY NIGHTMARE: Using regular data_json attribute
+  data_json = jsonencode({
+    password = "super-secret-db-password-123" # 💀 EXPOSED!
+    # ... other secrets
+  })
+}
+```
+
+**[SCREEN: Terraform plan output]**
+
+**HOST:** Now here's the deceptive part - when I run terraform plan, it shows `(sensitive value)` which looks safe, right? This gives you a false sense of security!
+
+**[SCREEN: Plan output showing (sensitive value)]**
+
+The plan looks secure, but watch what happens when we apply this and examine the state file...
+
+### [08:30 - 11:00] STATE FILE ANALYSIS: THE SECURITY NIGHTMARE REVEALED
+
+**[SCREEN: Terminal running state file analysis]**
+
+**HOST:** This is where the educational script really shines. It automatically analyzes the state file and shows you exactly what went wrong.
+
+**[SCREEN: Educational script output showing state analysis]**
+
+Look at this analysis:
+
+```bash
+# Searching for our "secret" password in the state file
+grep -q 'super-secret-db-password-123' terraform.tfstate
+# FOUND IT! The secret password is in the state file
+```
+
+**[SCREEN: Grep results showing multiple matches]**
+
+**HOST:** SEVEN MATCHES! Our production database password appears 7 times in the state file. Let me show you what the educational script reveals:
+
+**[SCREEN: Educational script showing security analysis]**
+
+```bash
+🔢 Number of times our specific password appears in state:
+7
+
+💀 Raw JSON in state exposes complete database credentials
+```
+
+**[SCREEN: State file JSON showing exposed secrets]**
+
+**HOST:** The educational script doesn't just tell you there's a problem - it shows you exactly how bad it is. Anyone with access to this state file can extract:
+- Database passwords
+- Root credentials  
+- Complete connection details
+- Everything needed to access production systems!
+
+**[SCREEN: Attack vector analysis from script]**
+
+The script analyzes the attack vectors too:
+- State files in version control (Git)
+- State files in CI/CD logs
+- Shared state backends (S3, Terraform Cloud)
+- Developer machines with state files
+- Backup systems containing state files
+
+This is why write-only attributes are REVOLUTIONARY!
+
+### [11:00 - 15:30] SECURE DEMO: Write-Only Attributes Solution
+
+**[SCREEN: Terminal]**
+
+**HOST:** Now let me show you the secure approach. Watch this dramatic transformation:
+
+**[TYPING IN TERMINAL]**
+```bash
+# Run the SECURE demo with write-only attributes
+./scripts/demo-secure-secrets.sh
+```
+
+**[SCREEN: Secure demo script running]**
+
+**HOST:** This educational script is comprehensive. It guides you through every step, explains what's happening, and verifies the security improvements.
+
+**[SCREEN: Secure configuration]**
+
+Here's our secure configuration using write-only attributes:
+
+```hcl
+# ✅ SECURE: Store database credentials using write-only attributes
 resource "vault_kv_secret_v2" "database_config" {
-  mount = vault_mount.demo.path
-  name  = "database/postgres"
-  
-  # Write-only attribute - secrets never stored in state!
+  # 🔒 WRITE-ONLY ATTRIBUTE: Secrets never stored in state!
   data_json_wo = jsonencode({
-    host     = "production-db.company.com"
-    port     = 5432
-    database = "myapp"
-    username = "app_user"
-    password = "super-secret-db-password-123"
-    ssl_mode = "require"
+    password = "super-secret-db-password-123" # 🔒 PROTECTED!
+    # ... other secrets
   })
   
   data_json_wo_version = var.secret_version
 }
 ```
 
-**HOST:** Notice the `data_json_wo` attribute - that's our write-only attribute. Now let's see the plan:
+**[SCREEN: Terraform plan output]**
 
-**[SCREEN: Terminal running terraform init && terraform plan]**
+**HOST:** Now watch the plan output:
 
-```bash
-terraform init
-terraform plan
 ```
-
-**[SCREEN: Plan output]**
-```
-# vault_kv_secret_v2.database_config will be created
 + resource "vault_kv_secret_v2" "database_config" {
     + data_json_wo         = (write-only attribute)  # 🔒 Never shown!
     + data_json_wo_version = 1
-    + delete_all_versions  = true
-    + id                   = (known after apply)
-    + mount                = "demo-secrets"
     + name                 = "database/postgres"
   }
 ```
 
-**HOST:** See that? It says "write-only attribute" instead of showing the actual secret value. This applies to ALL our secrets - database credentials, API keys, everything. Now let's apply this:
+**[SCREEN: Educational script verification]**
 
-**[SCREEN: Terminal running terraform apply]**
-
-**HOST:** Perfect! Now here's the crucial test - let's check the state file to see what happened to our secrets:
-
-**[SCREEN: Terminal showing state inspection]**
+The educational script automatically verifies the security:
 
 ```bash
-cat terraform.tfstate | grep -A 3 -B 1 '"data_json_wo":'
+🔐 Let's search for secrets in the state file...
+   Searching for: super-secret-db-password-123
+
+✅ EXCELLENT: Secret NOT found in state file!
 ```
 
-**[SCREEN: State file output]**
-```json
-"data_json_wo": null,
-"data_json_wo_version": 1,
-```
+**[SCREEN: State file showing null values]**
 
-**HOST:** Look at that! Every single write-only attribute is null in the state file. Our production secrets never touched the state file, but Vault received them and stored them securely.
-
-Let's verify they're actually in Vault:
-
-**[SCREEN: Terminal]**
 ```bash
-vault kv get -field=password demo-secrets/database/postgres
-# Returns: super-secret-db-password-123
+✅ Database write-only attribute in state:
+null
+
+✅ All write-only attributes show as: null
 ```
 
-### [07:15 - 09:30] EPHEMERAL RESOURCES: RETRIEVING SECRETS
+**HOST:** Look at that! The same secret that appeared 7 times in the insecure demo now appears ZERO times in the secure demo. The state file shows null for all write-only attributes.
 
-**[SCREEN: Scrolling to ephemeral resources section]**
+### [15:30 - 18:00] ADVANCED DEMO: EPHEMERAL RESOURCES INTEGRATION
 
-**HOST:** Now here's where it gets really powerful. Our demo also shows how to retrieve secrets using ephemeral resources. Look at this:
+**[SCREEN: Advanced demo configuration]**
 
-**[HIGHLIGHTING CODE]**
+**HOST:** Now let me show you the advanced integration. The secure demo (`examples/secure/complete-demo.tf`) combines write-only attributes with ephemeral resources.
+
+**[SCREEN: Secure demo file structure]**
+
 ```hcl
-# Retrieve database config without storing in state
+# ✅ SECURE: Retrieve secrets without storing in state
 ephemeral "vault_kv_secret_v2" "db_config" {
   mount = vault_mount.demo.path
   name  = vault_kv_secret_v2.database_config.name
-  
-  # Defer until mount is created
-  mount_id = vault_mount.demo.id
 }
-```
 
-**HOST:** This ephemeral resource reads our secrets from Vault but never stores them in state. Now watch how we use those retrieved secrets in other resources:
-
-**[HIGHLIGHTING CODE]**
-```hcl
-# Use retrieved secrets in other resources
+# ✅ SECURE: Secret composition using ephemeral + write-only
 resource "vault_kv_secret_v2" "complete_app_config" {
-  mount = vault_mount.demo.path
-  name  = "app/final-config"
-  
-  # 🔒 Complete config with all secrets - never stored in state
   data_json_wo = jsonencode({
-    # Database connection string using retrieved secrets
-    database_url = format(
-      "postgresql://%s:%s@%s:%s/%s?sslmode=%s",
+    # Database URL using ephemeral retrieval
+    database_url = format("postgresql://%s:%s@%s...",
       ephemeral.vault_kv_secret_v2.db_config.data.username,
       ephemeral.vault_kv_secret_v2.db_config.data.password,
-      ephemeral.vault_kv_secret_v2.db_config.data.host,
-      ephemeral.vault_kv_secret_v2.db_config.data.port,
-      ephemeral.vault_kv_secret_v2.db_config.data.database,
-      ephemeral.vault_kv_secret_v2.db_config.data.ssl_mode
+      # ... ephemeral secrets flow securely
     )
   })
 }
 ```
 
-**HOST:** This is incredible - secrets flow from Vault through ephemeral resources into write-only attributes without EVER touching the state file. Let me verify this:
+**[SCREEN: Educational script showing ephemeral verification]**
 
-**[SCREEN: Terminal commands]**
+**HOST:** The educational script verifies that ephemeral resources don't appear in state:
+
 ```bash
-# Check ephemeral resources don't appear in state
-terraform state list | grep ephemeral
-# Should return empty - ephemeral resources aren't stored!
+⚡ Let's check ephemeral resources (they shouldn't be in state!)
+   Command: terraform state list | grep ephemeral
 
-# Verify secrets are accessible
-vault kv get demo-secrets/api/external-services
+✅ PERFECT: No ephemeral resources in state file!
+   Ephemeral resources are used during configuration but never persisted
 ```
 
-**HOST:** Perfect! The ephemeral resources aren't stored in state, but we can access the secrets in Vault. Now let me show you how updates work with version tracking:
+This is incredible - secrets flow from Vault through ephemeral resources into write-only attributes without EVER touching the state file!
 
-**[SCREEN: Terminal]**
-```bash
-# Update secrets by incrementing version
-terraform apply -var="secret_version=2"
-```
+### [18:00 - 20:30] REAL POSTGRESQL DYNAMIC SECRETS TESTING
 
-**[SCREEN: Plan output]**
-```
-# vault_kv_secret_v2.database_config will be updated in-place
-~ resource "vault_kv_secret_v2" "database_config" {
-    ~ data_json_wo_version = 1 -> 2
-      # Secret value change not shown in plan!
-  }
-```
+**[SCREEN: PostgreSQL integration]**
 
-**HOST:** See that? Only the version number changes in the plan - the actual secret values are never shown, even during updates!
+**HOST:** But wait, there's more! The demo includes real PostgreSQL dynamic secrets. Let me show you this in action:
 
-### [09:30 - 12:00] DYNAMIC DATABASE SECRETS: THE ULTIMATE DEMO
+**[SCREEN: Dynamic secrets configuration]**
 
-**[SCREEN: Scrolling to database secrets engine section]**
-
-**HOST:** Now let me show you something really powerful - dynamic database secrets with a real PostgreSQL database. This takes write-only attributes to the next level by combining them with Vault's database secrets engine.
-
-**[HIGHLIGHTING CODE]**
 ```hcl
-# Enable database secrets engine
-resource "vault_mount" "database" {
-  path        = "database"
-  type        = "database"
-  description = "Dynamic database credentials"
-}
-
-# Configure database connection using ephemeral secrets
+# ✅ SECURE: Database connection using write-only password
 resource "vault_database_secret_backend_connection" "postgres" {
-  backend = vault_mount.database.path
-  name    = "postgres-connection"
-
-  allowed_roles     = ["app-role", "readonly-role"]
-  verify_connection = true # With our real PostgreSQL database!
-
   postgresql {
-    connection_url = "postgresql://{{username}}:{{password}}@localhost:5432/postgres"
-
     # 🔒 Root password never stored in state
-    username            = "postgres"
-    password_wo         = tostring(ephemeral.vault_kv_secret_v2.db_config.data.password)
+    password_wo         = "postgres-root-password-123"
     password_wo_version = var.secret_version
   }
 }
-```
 
-**HOST:** Notice how we're using `password_wo` - another write-only attribute - to pass the database root password without storing it in state. And we're getting that password from our ephemeral resource!
-
-**[HIGHLIGHTING CODE]**
-```hcl
-# Generate dynamic database credentials (ephemeral)
+# Generate dynamic credentials (ephemeral)
 ephemeral "vault_database_secret" "dynamic_db_creds" {
   mount = vault_mount.database.path
   name  = vault_database_secret_backend_role.app_role.name
-
-  # Defer until database role is created
-  mount_id = vault_mount.database.id
 }
 ```
 
-**HOST:** This ephemeral resource will generate fresh PostgreSQL credentials every time we run Terraform. Let's test this:
+**[SCREEN: Educational script testing dynamic credentials]**
 
-**[SCREEN: Terminal running terraform apply]**
+**HOST:** The educational script actually tests these dynamic credentials:
 
-**HOST:** Now let's see Vault generate dynamic database credentials:
-
-**[TYPING IN TERMINAL]**
 ```bash
+🔍 Generate dynamic PostgreSQL credentials:
 vault read database/creds/app-role
+
+Generated dynamic user: v-token-app-role-PbzYtG6qwATCcteSSX6j-1750864908
+Testing database connection...
+
+✅ SUCCESS: Dynamic credentials work perfectly!
 ```
 
-**[SCREEN: Vault output]**
-```
-Key                Value
----                -----
-lease_id           database/creds/app-role/ybbtk7vwL5jeQB7QIAGqkdP8
-lease_duration     1h
-lease_renewable    true
-password           ORC71M1C-mZjT1ewqkYt
-username           v-token-app-role-PbzYtG6qwATCcteSSX6j-1750864908
-```
+**[SCREEN: Real PostgreSQL connection test]**
 
-**HOST:** Look at that! Vault just created a real PostgreSQL user with a 1-hour TTL. Let's test if it actually works:
+**HOST:** And here's the amazing part - we can connect to a real PostgreSQL database using these dynamically generated credentials:
 
-**[TYPING IN TERMINAL]**
 ```bash
-docker exec -it terraform-demo-postgres psql \
-  -U v-token-app-role-PbzYtG6qwATCcteSSX6j-1750864908 \
+docker exec terraform-demo-postgres psql \
+  -U "v-token-app-role-PbzYtG6qwATCcteSSX6j-1750864908" \
   -d postgres \
-  -c "SELECT current_user, now(), 'Dynamic credentials work' as message;"
+  -c "SELECT current_user, 'Dynamic credentials work!' as message;"
 ```
 
-**[SCREEN: PostgreSQL query result]**
-```
-                   current_user                   |              now              |         message          
---------------------------------------------------+-------------------------------+--------------------------
- v-token-app-role-PbzYtG6qwATCcteSSX6j-1750864908 | 2025-06-25 15:22:10.688907+00 | Dynamic credentials work
-```
+These are real PostgreSQL users that automatically expire after 1 hour!
 
-**HOST:** INCREDIBLE! We just connected to PostgreSQL using a dynamically generated user that will automatically expire in 1 hour. And here's the best part - let's see how we use these dynamic credentials in our Terraform configuration:
+### [20:30 - 23:00] COMPLETE SECURITY VERIFICATION & STATE ANALYSIS
 
-**[HIGHLIGHTING CODE]**
-```hcl
-# Store application config using real dynamic credentials
-resource "vault_kv_secret_v2" "app_with_dynamic_db" {
-  mount = vault_mount.demo.path
-  name  = "app/dynamic-db-real"
+**[SCREEN: Comprehensive security analysis]**
 
-  # 🔒 Real dynamic database credentials from PostgreSQL
-  data_json_wo = jsonencode({
-    # Real dynamic database connection using ephemeral credentials:
-    database = {
-      host     = "localhost"
-      port     = "5432"
-      database = "postgres"
-      # These are real dynamic, short-lived credentials from Vault!
-      username = tostring(ephemeral.vault_database_secret.dynamic_db_creds.username)
-      password = tostring(ephemeral.vault_database_secret.dynamic_db_creds.password)
-    }
+**HOST:** The educational scripts provide complete security verification. Let me show you the comprehensive analysis:
 
-    # Complete connection string using dynamic credentials
-    connection_url = format(
-      "postgresql://%s:%s@localhost:5432/postgres",
-      ephemeral.vault_database_secret.dynamic_db_creds.username,
-      ephemeral.vault_database_secret.dynamic_db_creds.password
-    )
-  })
-}
-```
+**[SCREEN: Educational script security analysis]**
 
-**HOST:** This is the complete security model in action:
-- Static secrets stored with write-only attributes
-- Dynamic secrets generated on-demand with auto-expiration
-- Secret composition combining ephemeral resources into new configurations
-- Zero state exposure - no secrets ever stored in Terraform state
-
-**[SCREEN: Checking the final secret in Vault]**
 ```bash
-vault kv get demo-secrets/app/dynamic-db-real
+✅ SECURITY ANALYSIS: WHAT WENT RIGHT?
+
+🔐 SECURE APPROACH BENEFITS:
+   1. ✅ Secrets show as '(write-only attribute)' in plan
+   2. ✅ Write-only attributes are 'null' in state file
+   3. ✅ Ephemeral resources don't appear in state at all
+   4. ✅ Secrets safely stored in Vault
+   5. ✅ Dynamic credentials work with real database
+   6. ✅ Complete functionality with zero state exposure
+
+🛡️  ATTACK SURFACE ELIMINATED:
+   • State files can be safely stored anywhere
+   • CI/CD logs don't expose secrets
+   • Developers can share state files
+   • Backup systems are secure
+   • Git repositories are safe
 ```
 
-**HOST:** And there it is - our complete application configuration with real dynamic PostgreSQL credentials, all stored securely in Vault but never touching our Terraform state file!
+**[SCREEN: Before/after comparison]**
 
-### [12:00 - 14:15] PRODUCTION BEST PRACTICES
+```bash
+📊 BEFORE (Traditional approach):
+   💀 terraform plan: Shows ALL secrets in plain text
+   💀 terraform.tfstate: Contains ALL secrets in plain text
+   💀 Attack surface: MASSIVE
 
-**[SCREEN: Best practices slide]**
+📊 AFTER (Write-only attributes):
+   ✅ terraform plan: Shows '(write-only attribute)'
+   ✅ terraform.tfstate: Shows 'null' for write-only attributes
+   ✅ ephemeral resources: Don't appear in state at all
+   ✅ Attack surface: ELIMINATED
+```
 
-**HOST:** Now let's talk about production best practices, because this is where the rubber meets the road.
+**HOST:** This side-by-side comparison shows the dramatic security improvement. It's not just about adding a feature - it's about fundamentally transforming the security model of Infrastructure as Code.
 
-**First: Always use version tracking with variables:**
+### [23:00 - 25:00] EDUCATIONAL BENEFITS & PRODUCTION BEST PRACTICES
 
-**[TYPING]**
+**[SCREEN: Educational workflow diagram]**
+
+**HOST:** This educational approach provides incredible benefits:
+
+**[SCREEN: Learning benefits]**
+
+1. **Problem First**: You see exactly why traditional approaches are dangerous
+2. **Solution Second**: Experience the dramatic security improvement
+3. **State Analysis**: Compare before/after state files side-by-side
+4. **Real Testing**: Dynamic PostgreSQL credentials with actual database
+5. **Complete Verification**: Thorough security analysis and testing
+
+**[SCREEN: Production best practices]**
+
+**HOST:** For production use, the demo teaches these best practices:
+
 ```hcl
+# Always use version tracking
+data_json_wo_version = var.secret_version
+
+# Implement proper validation
 variable "secret_version" {
-  description = "Version of the secret data"
-  type        = number
   validation {
     condition     = var.secret_version > 0
     error_message = "Secret version must be positive."
   }
 }
-
-resource "vault_kv_secret_v2" "production_secret" {
-  mount                = vault_mount.secrets.path
-  name                 = "app-credentials"
-  data_json_wo         = var.secret_data
-  data_json_wo_version = var.secret_version
-}
 ```
 
-**Second: Integrate with CI/CD pipelines:**
+**[SCREEN: Update workflow]**
 
-**[SCREEN: GitHub Actions YAML]**
-```yaml
-name: Update Production Secrets
-on:
-  workflow_dispatch:
-    inputs:
-      secret_version:
-        description: 'Secret version number'
-        required: true
-        type: number
+**HOST:** Updates are secure through version tracking:
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Update Secrets
-      run: |
-        terraform apply \
-          -var="secret_version=${{ github.event.inputs.secret_version }}" \
-          -var="secret_data=${{ secrets.DATABASE_PASSWORD }}"
-```
-
-**HOST:** **Third: Use with external secret management systems:**
-
-**[TYPING]**
-```hcl
-# Read from external source
-data "external" "app_secrets" {
-  program = ["vault", "kv", "get", "-format=json", "secret/myapp"]
-}
-
-resource "vault_kv_secret_v2" "app_secrets" {
-  mount                = vault_mount.secrets.path
-  name                 = "application-secrets"
-  data_json_wo         = data.external.app_secrets.result.data
-  data_json_wo_version = var.deployment_version
-}
-```
-
-**HOST:** This pattern lets you pull secrets from any external system - AWS Secrets Manager, Azure Key Vault, 1Password, whatever you're using - and inject them into Terraform without state file exposure.
-
-### [14:15 - 15:30] MIGRATION STRATEGY
-
-**[SCREEN: Migration phases diagram]**
-
-**HOST:** If you're already using Terraform with secrets, here's how to migrate safely:
-
-**Phase 1: Audit your current secret usage**
 ```bash
-# Find all sensitive attributes in your state
-terraform state list | xargs -I {} terraform state show {} | grep -i "password\|secret\|key\|token"
+# Update secrets by incrementing version
+terraform apply -var="secret_version=2"
+
+# Only version changes in plan - secrets never shown!
+# ~ data_json_wo_version = 1 -> 2
 ```
 
-**Phase 2: Gradual migration - run both old and new attributes temporarily:**
-```hcl
-resource "vault_kv_secret_v2" "migration_example" {
-  mount = vault_mount.secrets.path
-  name  = "migration-test"
-  
-  # Keep existing during transition
-  data_json = jsonencode(var.secrets)
-  
-  # Add new write-only version
-  data_json_wo         = jsonencode(var.secrets)
-  data_json_wo_version = var.secret_version
-}
-```
-
-**Phase 3: Remove old attributes and update all workflows**
-
-**[SCREEN: Current provider support]**
-
-**HOST:** Right now, the Vault provider leads the way with support for:
-- `vault_kv_secret_v2.data_json_wo`
-- `vault_database_secret_backend_connection.password_wo`  
-- `vault_gcp_secret_backend.credentials_wo`
-
-But expect this to expand rapidly across the entire Terraform ecosystem.
-
-### [15:30 - 16:30] WRAP-UP & NEXT STEPS
+### [25:00 - 27:00] WRAP-UP & NEXT STEPS
 
 **[SCREEN: Summary points]**
 
-**HOST:** Let's wrap up with why this is such a game changer:
+**HOST:** Let's wrap up with why this educational approach is so powerful:
 
-**Security Impact:**
+**[SCREEN: Key takeaways]**
+
+**Educational Impact:**
+- Experience the security nightmare first-hand
+- See the dramatic improvement with write-only attributes
+- Understand why this is revolutionary for Infrastructure as Code
+- Complete hands-on learning with real systems
+
+**Security Benefits:**
 - No more secrets in state files - ever
-- Reduced attack surface 
+- Reduced attack surface dramatically
 - Easier compliance and auditing
 - True GitOps for secrets
 
-**Operational Benefits:**
-- Better CI/CD integration
-- Seamless secret rotation
-- Works with any secret management system
-- No breaking changes to existing workflows
+**Technical Capabilities:**
+- Write-only attributes for secret storage
+- Ephemeral resources for secret retrieval
+- Real PostgreSQL dynamic secrets
+- Complete security verification
 
-**[SCREEN: Upgrade checklist]**
+**[SCREEN: Getting started checklist]**
 
 **Your next steps:**
-1. Ensure you have Terraform 1.11+ (this demo uses v1.12.1)
-2. Update your provider versions (Vault 5.0+ for these features)
-3. Start with a non-production test using our demo
-4. Plan your migration strategy
-5. Update your CI/CD pipelines
+1. Clone the educational demo repository
+2. Run the insecure demo to see the problem
+3. Run the secure demo to see the solution
+4. Explore the advanced integration
+5. Test with real PostgreSQL dynamic secrets
+6. Plan your migration strategy
+
+**[SCREEN: Repository structure reminder]**
+
+The educational structure makes this perfect for:
+- **Students**: Learn problem → solution progression
+- **Teams**: Demonstrate security improvements
+- **Presentations**: Show dramatic before/after comparison
+- **Production**: Real-world implementation examples
+
+**[SCREEN: Call to action]**
+
+**HOST:** This isn't just about learning new syntax - it's about experiencing a fundamental shift in Infrastructure as Code security. The educational scripts guide you through every step, from seeing the security nightmare to implementing the revolutionary solution.
 
 **[SCREEN: Links and resources]**
 
-I've put all the example code in the description, along with links to the official documentation. This is honestly the biggest security improvement in Terraform since sensitive variables were introduced.
+I've put all the code and documentation links in the description. This is honestly the biggest security improvement in Terraform since sensitive variables were introduced, and this educational approach shows you exactly why.
 
-The future of Infrastructure as Code is more secure, and it starts with write-only attributes. Trust me, your security team will thank you for this.
+Run the demos, experience the transformation, and see for yourself how write-only attributes will change your Infrastructure as Code forever.
 
-What questions do you have about write-only attributes? Drop them in the comments below, and if this helped you out, smash that like button and subscribe for more DevOps content.
+What questions do you have about this educational approach to write-only attributes? Drop them in the comments below, and if this comprehensive demo helped you understand the security transformation, smash that like button and subscribe for more DevOps educational content.
 
 Until next time, keep your infrastructure secure and your secrets out of state files!
 
@@ -538,29 +485,34 @@ Until next time, keep your infrastructure secure and your secrets out of state f
 ## POST-PRODUCTION NOTES:
 
 ### Visual Elements to Include:
-1. **Split-screen comparisons** showing state files before/after
-2. **Animated diagrams** explaining the write-only concept
-3. **Code highlighting** for key syntax differences
-4. **Terminal recordings** showing real terraform plan/apply output
-5. **Security vulnerability visualization** showing exposed vs protected secrets
+1. **Educational flow diagrams** showing problem → solution progression
+2. **Split-screen state file comparisons** before/after
+3. **Real terminal recordings** of educational scripts running
+4. **Security analysis visualizations** showing attack surface elimination
+5. **PostgreSQL connection demonstrations** with dynamic credentials
+
+### Educational Script Overlays:
+1. **Warning overlays** during insecure demo showing security risks
+2. **Success indicators** during secure demo showing protection
+3. **State file analysis results** with search commands and results
+4. **Real-time security verification** showing null values vs exposed secrets
 
 ### Call-to-Action Cards:
-1. Subscribe button at 2:00 mark
-2. Like reminder at 10:00 mark
-3. Related video suggestions at end
-4. GitHub repository link overlay
+1. Subscribe button at 3:00 mark (after problem setup)
+2. Like reminder at 15:00 mark (after security transformation)
+3. Comment prompt at 20:00 mark (after PostgreSQL demo)
+4. Repository link overlay throughout
 
 ### SEO Keywords:
-- Terraform 1.11
-- Write-only attributes
-- Terraform secrets
-- HashiCorp Vault
+- Terraform 1.11 educational demo
+- Write-only attributes security
+- Terraform secrets management
 - Infrastructure as Code security
-- Terraform state file security
+- Educational programming tutorials
 - DevOps security best practices
 
 ### Related Video Topics:
-1. "Complete Terraform Security Guide 2024"
-2. "HashiCorp Vault Integration with Terraform"
-3. "Terraform State File Security Deep Dive"
-4. "GitOps Secrets Management Strategies"
+1. "Complete Terraform Security Migration Guide"
+2. "Building Educational DevOps Demos That Teach"
+3. "PostgreSQL Dynamic Secrets Deep Dive"
+4. "GitOps Secrets Management Educational Series"
