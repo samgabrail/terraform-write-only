@@ -369,14 +369,152 @@ This educational repository demonstrates the most significant advancement in Ter
 
 ...represents a fundamental shift in how we approach Infrastructure as Code security.
 
+## Frequently Asked Questions
+
+### Q: How do write-only attributes differ from sensitive variables?
+
+**A:** Sensitive variables are masked in output but still stored in state files. Write-only attributes are **never stored anywhere** - not in plan files, state files, or logs. They're truly write-only.
+
+```hcl
+# Sensitive variable - still stored in state as sensitive
+variable "db_password" {
+  sensitive = true
+}
+
+# Write-only attribute - never stored anywhere
+resource "vault_kv_secret_v2" "config" {
+  data_json_wo = jsonencode({
+    password = "secret"  # Never stored!
+  })
+}
+```
+
+### Q: How do updates work if the values aren't stored in state?
+
+**A:** Updates use version tracking. When you change a write-only attribute, increment the version to signal Terraform that an update is needed:
+
+```hcl
+resource "vault_kv_secret_v2" "config" {
+  data_json_wo         = jsonencode({...})
+  data_json_wo_version = var.secret_version  # Increment to update
+}
+```
+
+### Q: What happens during `terraform import` with resources that have write-only attributes?
+
+**A:** Write-only attributes are set to `null` during import since their values can't be read from the existing resource. You'll need to provide the values and version during the next apply.
+
+### Q: Can I use write-only attributes with all Terraform providers?
+
+**A:** No, providers must explicitly support write-only attributes. The HashiCorp Vault provider added support in recent versions. Check provider documentation for `*_wo` and `*_wo_version` attributes.
+
+### Q: Are there any performance implications?
+
+**A:** Write-only attributes can actually improve performance because:
+- Smaller state files (no secret storage)
+- Reduced plan/apply times (less data to process)
+- Better CI/CD performance (secrets not transferred in state)
+
+### Q: Can I migrate existing configurations to use write-only attributes?
+
+**A:** Yes! Here's the migration approach:
+
+```hcl
+# Before (insecure)
+resource "vault_kv_secret_v2" "config" {
+  data_json = jsonencode({
+    password = "secret"
+  })
+}
+
+# After (secure) - rename attribute and add version
+resource "vault_kv_secret_v2" "config" {
+  data_json_wo         = jsonencode({
+    password = "secret"
+  })
+  data_json_wo_version = 1
+}
+```
+
+**Migration steps:**
+1. Update configuration with `*_wo` attributes
+2. Run `terraform apply` - Terraform will update the resource
+3. Verify secrets are no longer in state file
+
+### Q: Do I need ephemeral resources to use write-only attributes?
+
+**A:** No, they're independent features:
+- **Write-only attributes** = Store secrets without state persistence
+- **Ephemeral resources** = Retrieve secrets without state persistence
+- **Together** = Complete secure secrets workflow
+
+### Q: How do I troubleshoot issues with write-only attributes?
+
+**A:** Common troubleshooting approaches:
+
+```bash
+# 1. Verify provider supports write-only attributes
+terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/vault"'
+
+# 2. Check for version mismatches
+terraform plan  # Look for version changes
+
+# 3. Enable detailed logging
+export TF_LOG=DEBUG
+terraform apply
+
+# 4. Verify secrets aren't in state
+grep -r "your-secret-value" terraform.tfstate  # Should return empty
+```
+
+### Q: What Terraform versions support these features?
+
+**A:** 
+- **Write-only attributes**: Terraform 1.11+
+- **Ephemeral resources**: Terraform 1.10+
+- **This demo uses**: Terraform v1.12.1 with Vault provider
+
+### Q: Can I use write-only attributes in modules?
+
+**A:** Yes! Pass secrets through module variables:
+
+```hcl
+# Module usage
+module "secure_vault" {
+  source = "./modules/vault-secrets"
+  
+  secret_data    = var.database_credentials
+  secret_version = var.secret_version
+}
+
+# Module definition
+resource "vault_kv_secret_v2" "config" {
+  data_json_wo         = var.secret_data
+  data_json_wo_version = var.secret_version
+}
+```
+
+### Q: What happens if I accidentally use a regular attribute instead of write-only?
+
+**A:** The demo shows exactly this scenario! Run `./scripts/demo-insecure-secrets.sh` to see how regular attributes expose secrets in state files. Always verify with:
+
+```bash
+# Check for exposed secrets (should return nothing with write-only)
+grep "your-secret-value" terraform.tfstate
+```
+
+## Additional Resources
+
+For deeper technical understanding and implementation details, explore these official documentation resources:
+
+- **Terraform Docs on write_only** ► https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/write-only-arguments
+- **Write-only attributes in the Vault provider** ► https://developer.hashicorp.com/terraform/plugin/sdkv2/resources/write-only-arguments  
+- **Ephemeral Resources in Terraform** ► https://developer.hashicorp.com/terraform/language/resources/ephemeral
+
 ## Conclusion
 
 Terraform 1.11's write-only attributes, combined with ephemeral resources, solve the biggest pain point in Infrastructure as Code: secure secrets management. This educational demo shows not just how to use these features, but WHY they're revolutionary.
 
 By experiencing the security problem first-hand and then seeing the dramatic improvement, you understand the true value of these features. The complete integration with real PostgreSQL dynamic secrets demonstrates production-ready capabilities.
 
-The future of Terraform is more secure, and this educational journey shows you exactly how to get there.
-
----
-
-*Ready to experience the revolution?* Run the educational demo sequence and see for yourself how write-only attributes transform Infrastructure as Code security forever. 
+The future of Terraform is more secure, and this educational journey shows you exactly how to get there. 

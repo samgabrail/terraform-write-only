@@ -94,3 +94,14 @@ Development mode should NOT be used in production installations!
 2025-06-26T11:19:03.223-0400 [INFO]  secrets.database.database_a46a1e4e: populating role rotation queue
 2025-06-26T11:19:03.224-0400 [INFO]  secrets.database.database_a46a1e4e: starting periodic ticker
 2025-06-26T11:31:25.498-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h4eb9cdf7970ebe37bfefb6acf76939172c8c57ea3442b0d16b5d755855713f90
+2025-06-26T11:36:37.558-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/hbd0fe6a7ffd9fc001f3af6cce6e9bb01d7c3b3fe7841be8ddc026cd28db5ee7a
+2025-06-26T11:36:37.685-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/hd01e446a725febe48032b6880ac4cb9673d33acfcbb5cbe9e7a7419e70879c1e
+2025-06-26T11:39:03.152-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h2f63cce733566d8418b53343b3f1ff16c9029197621ecd1cca013c50f565cc4a
+2025-06-26T11:44:50.236-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h0dee427592d908bb8d34a07171b92e8d3cee383dc88ade8e74c88372f0e941ab
+2025-06-26T11:44:50.329-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h7a665a54ed38aa7ca1816eeeb84c66d7ef6b49db537ed7629545a648e5808d2e
+2025-06-26T11:56:19.403-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/hc1bdd33f7f2feccb05c2e4a3cf963656c10fdbb27f09ab987319d637d87e644d
+2025-06-26T11:56:19.470-0400 [INFO]  expiration: revoked lease: lease_id=database/creds/app-role/HaOrIHU4D4KZulnVRmvwhIU0
+2025-06-26T11:56:20.997-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h595b2cef5f55b31341b36d32cf0cc679065683a5a37a8d0ed372e4ef00eae47c
+2025-06-26T11:56:21.021-0400 [INFO]  expiration: revoked lease: lease_id=database/creds/app-role/zZseug9tc75Egw9RBH1BFnlw
+2025-06-26T12:22:14.129-0400 [INFO]  expiration: revoked lease: lease_id=database/creds/app-role/k3xKi5sLgCbMoeGXVH4mmDPN
+2025-06-26T12:22:14.173-0400 [INFO]  expiration: revoked lease: lease_id=database/creds/app-role/S948JnYCaZQZxQJDU3I0vgiV
