@@ -1,0 +1,96 @@
+==> Vault server configuration:
+
+Administrative Namespace: 
+             Api Address: http://127.0.0.1:8200
+                     Cgo: disabled
+         Cluster Address: https://127.0.0.1:8201
+   Environment Variables: COLORTERM, DISPLAY, FNM_ARCH, FNM_COREPACK_ENABLED, FNM_DIR, FNM_LOGLEVEL, FNM_MULTISHELL_PATH, FNM_NODE_DIST_MIRROR, FNM_RESOLVE_ENGINES, FNM_VERSION_FILE_STRATEGY, GIT_ASKPASS, HOME, HOMEBREW_CELLAR, HOMEBREW_PREFIX, HOMEBREW_REPOSITORY, HOSTTYPE, INFOPATH, LANG, LESSCLOSE, LESSOPEN, LOGNAME, NAME, NGINX_API_KEY, OLDPWD, PATH, PULSE_SERVER, PWD, SHELL, SHLVL, TERM, TERM_PROGRAM, TERM_PROGRAM_VERSION, TF_VAR_vault_address, TF_VAR_vault_token, USER, VAULT_ADDR, VAULT_TOKEN, VSCODE_GIT_ASKPASS_EXTRA_ARGS, VSCODE_GIT_ASKPASS_MAIN, VSCODE_GIT_ASKPASS_NODE, VSCODE_GIT_IPC_HANDLE, VSCODE_IPC_HOOK_CLI, WAYLAND_DISPLAY, WSL2_GUI_APPS_ENABLED, WSLENV, WSL_DISTRO_NAME, WSL_INTEROP, WT_PROFILE_ID, WT_SESSION, XDG_DATA_DIRS, XDG_RUNTIME_DIR, _
+              Go Version: go1.23.3
+              Listener 1: tcp (addr: "127.0.0.1:8200", cluster address: "127.0.0.1:8201", disable_request_limiter: "false", max_request_duration: "1m30s", max_request_size: "33554432", tls: "disabled")
+               Log Level: 
+                   Mlock: supported: true, enabled: false
+           Recovery Mode: false
+                 Storage: inmem
+                 Version: Vault v1.18.4, built 2025-01-29T13:57:54Z
+             Version Sha: 503be623a3697e8c10c254dc87d26492c46753e1
+
+==> Vault server started! Log data will stream in below:
+
+2025-06-26T11:07:59.643-0400 [INFO]  proxy environment: http_proxy="" https_proxy="" no_proxy=""
+2025-06-26T11:07:59.651-0400 [INFO]  incrementing seal generation: generation=1
+2025-06-26T11:07:59.651-0400 [WARN]  no `api_addr` value specified in config or in VAULT_API_ADDR; falling back to detection if possible, but this value should be manually set
+2025-06-26T11:07:59.656-0400 [INFO]  core: Initializing version history cache for core
+2025-06-26T11:07:59.656-0400 [INFO]  events: Starting event system
+2025-06-26T11:07:59.659-0400 [INFO]  core: security barrier not initialized
+2025-06-26T11:07:59.660-0400 [INFO]  core: security barrier initialized: stored=1 shares=1 threshold=1
+2025-06-26T11:07:59.663-0400 [INFO]  core: post-unseal setup starting
+2025-06-26T11:07:59.669-0400 [INFO]  core: loaded wrapping token key
+2025-06-26T11:07:59.669-0400 [INFO]  core: successfully setup plugin runtime catalog
+2025-06-26T11:07:59.669-0400 [INFO]  core: successfully setup plugin catalog: plugin-directory=""
+2025-06-26T11:07:59.669-0400 [INFO]  core: no mounts; adding default mount table
+2025-06-26T11:07:59.673-0400 [INFO]  core: successfully mounted: type=cubbyhole version="v1.18.4+builtin.vault" path=cubbyhole/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.678-0400 [INFO]  core: successfully mounted: type=system version="v1.18.4+builtin.vault" path=sys/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.679-0400 [INFO]  core: successfully mounted: type=identity version="v1.18.4+builtin.vault" path=identity/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.682-0400 [INFO]  core: successfully mounted: type=token version="v1.18.4+builtin.vault" path=token/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.682-0400 [INFO]  rollback: Starting the rollback manager with 256 workers
+2025-06-26T11:07:59.682-0400 [INFO]  rollback: starting rollback manager
+2025-06-26T11:07:59.683-0400 [INFO]  core: restoring leases
+2025-06-26T11:07:59.684-0400 [INFO]  expiration: lease restore complete
+2025-06-26T11:07:59.684-0400 [INFO]  identity: entities restored
+2025-06-26T11:07:59.684-0400 [INFO]  identity: groups restored
+2025-06-26T11:07:59.685-0400 [INFO]  core: Recorded vault version: vault version=1.18.4 upgrade time="2025-06-26 15:07:59.684916185 +0000 UTC" build date=2025-01-29T13:57:54Z
+2025-06-26T11:07:59.685-0400 [INFO]  core: post-unseal setup complete
+2025-06-26T11:07:59.686-0400 [INFO]  core: root token generated
+2025-06-26T11:07:59.686-0400 [INFO]  core: pre-seal teardown starting
+2025-06-26T11:07:59.687-0400 [INFO]  rollback: stopping rollback manager
+2025-06-26T11:07:59.687-0400 [INFO]  core: pre-seal teardown complete
+2025-06-26T11:07:59.687-0400 [INFO]  core.cluster-listener.tcp: starting listener: listener_address=127.0.0.1:8201
+2025-06-26T11:07:59.687-0400 [INFO]  core.cluster-listener: serving cluster requests: cluster_listen_address=127.0.0.1:8201
+2025-06-26T11:07:59.688-0400 [INFO]  core: post-unseal setup starting
+2025-06-26T11:07:59.688-0400 [INFO]  core: loaded wrapping token key
+2025-06-26T11:07:59.688-0400 [INFO]  core: successfully setup plugin runtime catalog
+2025-06-26T11:07:59.688-0400 [INFO]  core: successfully setup plugin catalog: plugin-directory=""
+2025-06-26T11:07:59.689-0400 [INFO]  core: successfully mounted: type=system version="v1.18.4+builtin.vault" path=sys/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.689-0400 [INFO]  core: successfully mounted: type=identity version="v1.18.4+builtin.vault" path=identity/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.689-0400 [INFO]  core: successfully mounted: type=cubbyhole version="v1.18.4+builtin.vault" path=cubbyhole/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.690-0400 [INFO]  core: successfully mounted: type=token version="v1.18.4+builtin.vault" path=token/ namespace="ID: root. Path: "
+2025-06-26T11:07:59.690-0400 [INFO]  rollback: Starting the rollback manager with 256 workers
+2025-06-26T11:07:59.690-0400 [INFO]  rollback: starting rollback manager
+2025-06-26T11:07:59.690-0400 [INFO]  core: restoring leases
+2025-06-26T11:07:59.691-0400 [INFO]  expiration: lease restore complete
+2025-06-26T11:07:59.691-0400 [INFO]  identity: entities restored
+2025-06-26T11:07:59.691-0400 [INFO]  identity: groups restored
+2025-06-26T11:07:59.692-0400 [INFO]  core: post-unseal setup complete
+2025-06-26T11:07:59.692-0400 [INFO]  core: vault is unsealed
+2025-06-26T11:07:59.697-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/root/ha7d6cfeace685cb49e87e31e540b77e07187299b0a879e868e289e69dddc9a79
+2025-06-26T11:07:59.706-0400 [INFO]  core: successful mount: namespace="" path=secret/ type=kv version="v0.20.0+builtin"
+WARNING! dev mode is enabled! In this mode, Vault runs entirely in-memory
+and starts unsealed with a single unseal key. The root token is already
+authenticated to the CLI, so you can immediately begin using Vault.
+
+You may need to set the following environment variables:
+
+    $ export VAULT_ADDR='http://127.0.0.1:8200'
+
+The unseal key and root token are displayed below in case you want to
+seal/unseal the Vault or re-authenticate.
+
+Unseal Key: n+mUUoXe7HhG/kAA/X8dG5eSmYITyvgnzVCxxcW38wA=
+Root Token: root
+
+Development mode should NOT be used in production installations!
+
+2025-06-26T11:11:25.558-0400 [INFO]  core: successful mount: namespace="" path=insecure-secrets/ type=kv version="v0.20.0+builtin"
+2025-06-26T11:11:25.732-0400 [INFO]  secrets.database.database_464149c9: initializing database rotation queue
+2025-06-26T11:11:25.733-0400 [INFO]  core: successful mount: namespace="" path=insecure-database/ type=database version="v1.18.4+builtin.vault"
+2025-06-26T11:11:25.734-0400 [INFO]  secrets.database.database_464149c9: populating role rotation queue
+2025-06-26T11:11:25.734-0400 [INFO]  secrets.database.database_464149c9: starting periodic ticker
+2025-06-26T11:16:37.757-0400 [INFO]  secrets.database.database_464149c9: stopping periodic ticker
+2025-06-26T11:16:37.758-0400 [INFO]  core: successfully unmounted: path=insecure-database/ namespace=""
+2025-06-26T11:16:37.763-0400 [INFO]  core: successfully unmounted: path=insecure-secrets/ namespace=""
+2025-06-26T11:19:03.211-0400 [INFO]  core: successful mount: namespace="" path=demo-secrets/ type=kv version="v0.20.0+builtin"
+2025-06-26T11:19:03.212-0400 [INFO]  secrets.database.database_a46a1e4e: initializing database rotation queue
+2025-06-26T11:19:03.212-0400 [INFO]  core: successful mount: namespace="" path=database/ type=database version="v1.18.4+builtin.vault"
+2025-06-26T11:19:03.223-0400 [INFO]  secrets.database.database_a46a1e4e: populating role rotation queue
+2025-06-26T11:19:03.224-0400 [INFO]  secrets.database.database_a46a1e4e: starting periodic ticker
+2025-06-26T11:31:25.498-0400 [INFO]  expiration: revoked lease: lease_id=auth/token/create/h4eb9cdf7970ebe37bfefb6acf76939172c8c57ea3442b0d16b5d755855713f90

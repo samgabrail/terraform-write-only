@@ -129,11 +129,35 @@ resource "vault_database_secret_backend_role" "app_role" {
 }
 
 # ========================================================
-# PART 3: SECURE SECRET COMPOSITION (Write-Only Only)
+# PART 3: SECURE SECRET RETRIEVAL (Ephemeral Resources)
 # ========================================================
 
-# ✅ SECURE: Create composite configuration using write-only attributes
-# Demonstrates secure secret composition without state exposure
+# ✅ SECURE: Retrieve database config without storing in state
+# Ephemeral resources provide temporary access during configuration
+ephemeral "vault_kv_secret_v2" "db_config" {
+  mount = vault_mount.demo.path
+  name  = vault_kv_secret_v2.database_config.name
+
+  # Defer until mount is created
+  mount_id = vault_mount.demo.id
+}
+
+# ✅ SECURE: Generate dynamic database credentials (ephemeral)
+# These credentials are temporary and never stored in state
+ephemeral "vault_database_secret" "dynamic_db_creds" {
+  mount = vault_mount.database.path
+  name  = vault_database_secret_backend_role.app_role.name
+
+  # Defer until database role is created
+  mount_id = vault_mount.database.id
+}
+
+# ========================================================
+# PART 4: SECURE SECRET COMPOSITION (Write-Only + Ephemeral)
+# ========================================================
+
+# ✅ SECURE: Create composite configuration using ephemeral secrets
+# Combines retrieved secrets into new configuration without state exposure
 resource "vault_kv_secret_v2" "complete_app_config" {
   mount               = vault_mount.demo.path
   name                = "app/complete-secure-config"
@@ -144,8 +168,23 @@ resource "vault_kv_secret_v2" "complete_app_config" {
     # Application metadata (not secret)
     application_name = "myapp-production"
 
-    # Static database connection (hardcoded for demo simplicity)
-    database_url = "postgresql://app_user:super-secret-db-password-123@production-db.company.com:5432/myapp?sslmode=require"
+    # Static database connection using ephemeral retrieval
+    database_url = format(
+      "postgresql://%s:%s@%s:%s/%s?sslmode=%s",
+      ephemeral.vault_kv_secret_v2.db_config.data.username,
+      ephemeral.vault_kv_secret_v2.db_config.data.password,
+      ephemeral.vault_kv_secret_v2.db_config.data.host,
+      ephemeral.vault_kv_secret_v2.db_config.data.port,
+      ephemeral.vault_kv_secret_v2.db_config.data.database,
+      ephemeral.vault_kv_secret_v2.db_config.data.ssl_mode
+    )
+
+    # Dynamic database credentials (auto-expiring)
+    dynamic_database = {
+      username = tostring(ephemeral.vault_database_secret.dynamic_db_creds.username)
+      password = tostring(ephemeral.vault_database_secret.dynamic_db_creds.password)
+      ttl      = "1h"
+    }
 
     # API keys and other secrets
     api_key    = "sk_live_abcdef123456789"
@@ -154,7 +193,7 @@ resource "vault_kv_secret_v2" "complete_app_config" {
     # Metadata
     created_at     = timestamp()
     security_level = "MAXIMUM - NO SECRETS IN STATE!" # 🔒 TRUTH!
-    approach       = "Write-only attributes"
+    approach       = "Write-only attributes + Ephemeral resources"
   })
 
   # Version tracking for secure updates
@@ -192,7 +231,7 @@ output "write_only_demonstration" {
     static_secret_wo   = "vault_kv_secret_v2.database_config.data_json_wo = null"
     dynamic_secret_wo  = "vault_database_secret_backend_connection.postgres.postgresql[0].password_wo = null"
     complete_config_wo = "vault_kv_secret_v2.complete_app_config.data_json_wo = null"
-    note               = "All secrets are protected - none appear in state files!"
+    ephemeral_note     = "Ephemeral resources don't appear in state at all!"
   }
 }
 
