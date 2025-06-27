@@ -116,6 +116,25 @@ When you run the insecure demo, you'll see:
 2. **But the terraform state file reveals everything** - `grep "super-secret-db-password-123" terraform.tfstate` finds 7+ matches!
 3. **Complete credential exposure** - anyone with terraform state access can extract all production secrets
 
+```mermaid
+flowchart TD
+    A["🔧 Terraform Configuration<br/>with Secrets"] --> B["📋 terraform plan"]
+    B --> C["✅ Shows (sensitive value)<br/>Looks Safe!"]
+    A --> D["⚡ terraform apply"]
+    D --> E["📄 terraform.tfstate"]
+    E --> F["💀 Secrets in Plain Text<br/>super-secret-db-password-123<br/>API keys, passwords, everything"]
+    
+    G["👥 Anyone with State Access"] --> E
+    G --> H["🎯 Complete Credential Theft<br/>• Git repositories<br/>• CI/CD logs<br/>• S3 buckets<br/>• Developer machines<br/>• Backup systems"]
+    
+    C --> I["😱 FALSE SENSE<br/>OF SECURITY"]
+    F --> I
+    
+    style I fill:#ff6b6b,stroke:#d63031,color:#fff
+    style F fill:#ff6b6b,stroke:#d63031,color:#fff
+    style H fill:#ff6b6b,stroke:#d63031,color:#fff
+```
+
 ### Phase 2: The Revolutionary Solution
 
 Now run the secure demo to see how write-only attributes protect your terraform state:
@@ -179,6 +198,30 @@ cat terraform.tfstate | grep -A 3 -B 1 '"data_json_wo":'
 
 grep "super-secret-db-password-123" terraform.tfstate
 # Output: (empty - no matches!)
+```
+
+```mermaid
+flowchart TD
+    A["🔧 Terraform Configuration<br/>with Write-Only Attributes"] --> B["📋 terraform plan"]
+    B --> C["✅ Shows (write-only attribute)<br/>Still Safe!"]
+    A --> D["⚡ terraform apply"]
+    D --> E["📄 terraform.tfstate"]
+    E --> F["🔒 data_json_wo: null<br/>password_wo: null<br/>Zero Secret Exposure"]
+    
+    A --> G["☁️ Ephemeral Resources"]
+    G --> H["🔄 Runtime Secret Retrieval"]
+    H --> I["🗑️ No State Persistence"]
+    
+    A --> J["🏦 HashiCorp Vault"]
+    J --> K["🔐 Secure Secret Storage"]
+    
+    L["👥 State File Access"] --> E
+    L --> M["✅ Complete Protection<br/>• No secrets found<br/>• Only null values<br/>• Attack surface eliminated"]
+    
+    style F fill:#00b894,stroke:#00a085,color:#fff
+    style M fill:#00b894,stroke:#00a085,color:#fff
+    style I fill:#00b894,stroke:#00a085,color:#fff
+    style K fill:#00b894,stroke:#00a085,color:#fff
 ```
 
 ## Advanced Demo: Write-Only Attributes + Ephemeral Resources
@@ -249,6 +292,34 @@ This demonstrates the complete terraform state security model:
 - **Dynamic secrets** generated on-demand with auto-expiration
 - **Secret composition** combining ephemeral resources into new configurations
 - **Zero terraform state exposure** - no secrets ever stored in terraform state
+
+```mermaid
+flowchart TB
+    subgraph "Write-Only + Ephemeral Architecture"
+        A["Terraform Configuration"] --> B["Write-Only Attributes<br/>data_json_wo<br/>password_wo"]
+        A --> C["Ephemeral Resources<br/>vault_kv_secret_v2<br/>vault_database_secret"]
+        
+        B --> D["terraform apply"]
+        C --> D
+        
+        D --> E["State File<br/>terraform.tfstate"]
+        E --> F["✅ Write-only: null<br/>✅ Ephemeral: not stored"]
+        
+        B --> G["HashiCorp Vault<br/>Secure Storage"]
+        C --> H["Runtime Retrieval<br/>No Persistence"]
+        
+        G --> I["Real Secret Storage<br/>🔐 Production Safe"]
+        H --> J["Dynamic Credentials<br/>⏰ Auto-Expiring"]
+    end
+    
+    subgraph "Security Verification"
+        K["Security Commands"] --> L["grep 'secret' terraform.tfstate<br/>→ No matches"]
+        K --> M["jq '.resources[].data_json_wo'<br/>→ null values only"]
+        K --> N["terraform state list | grep ephemeral<br/>→ Empty results"]
+    end
+    
+    F --> K
+```
 
 ## Real PostgreSQL Dynamic Secrets: The Complete Demo
 
@@ -397,6 +468,24 @@ grep -c "data_json_wo" terraform.tfstate  # Returns: 6 (all null values)
 - ✅ Secrets safely stored in Vault
 - ✅ Dynamic credentials work with real database
 - ✅ Complete functionality with zero terraform state exposure
+
+```mermaid
+graph LR
+    subgraph "Traditional Approach - DANGEROUS"
+        A1["terraform plan"] --> A2["(sensitive value)<br/>❌ False Security"]
+        A3["terraform.tfstate"] --> A4["Secrets in Plain Text<br/>💀 7+ Exposures"]
+        A4 --> A5["grep results:<br/>• password: 24 times<br/>• secret: 35 times<br/>• credentials: 7 times"]
+    end
+    
+    subgraph "Write-Only Approach - SECURE"
+        B1["terraform plan"] --> B2["(write-only attribute)<br/>✅ True Security"]
+        B3["terraform.tfstate"] --> B4["data_json_wo: null<br/>🔒 Zero Exposures"]
+        B4 --> B5["grep results:<br/>• password: 0 matches<br/>• secret: 0 matches<br/>• credentials: 0 matches"]
+    end
+    
+    A5 --> C["🎯 Attack Vectors<br/>Exposed"]
+    B5 --> D["🛡️ Attack Surface<br/>Eliminated"]
+```
 
 ## Getting Started Today
 
